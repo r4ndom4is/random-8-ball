@@ -554,7 +554,7 @@
   <footer class="credit">
     Advice courtesy of the
     <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>.
-    <span class="ver">v1.7.3</span>
+    <span class="ver">v1.8.0</span>
   </footer>
 
 <script>
@@ -867,12 +867,18 @@
     if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); }
   });
 
-  // --- Sharing (specific advice via ?id=, native share sheet + clipboard fallback) ---
+  // --- Sharing: link carries the slip id (authentic) AND the text (fallback,
+  // so the recipient always sees the advice even if the API can't be reached).
+  // No id + only ?advice= is reserved for future user-submitted advice. ---
   function buildShareData() {
     const base = location.origin + location.pathname;
-    const url = (currentSlipId !== null)
-      ? base + '?id=' + encodeURIComponent(currentSlipId)
-      : base;
+    let url = base;
+    if (currentAdvice) {
+      const params = new URLSearchParams();
+      if (currentSlipId !== null) params.set('id', currentSlipId);
+      params.set('advice', currentAdvice);
+      url = base + '?' + params.toString();
+    }
     const text = currentAdvice
       ? 'The RandoM 8-Ball told me: "' + currentAdvice + '" 🎱'
       : 'Get life advice you didn\'t ask for from the RandoM 8-Ball 🎱';
@@ -897,28 +903,48 @@
   }
   shareBtn.addEventListener('click', shareAdvice);
 
-  // --- Open a shared link: load that exact slip, then clean the URL ---
-  function getSharedId() {
-    const id = new URLSearchParams(location.search).get('id');
-    return (id && /^\d+$/.test(id)) ? id : null;
+  // --- Open a shared link ---
+  // Reads ?id= and/or ?advice= from the URL. Returns null if neither present.
+  function getShared() {
+    const p = new URLSearchParams(location.search);
+    const id = p.get('id');
+    const advice = p.get('advice');
+    const validId = (id && /^\d+$/.test(id)) ? id : null;
+    if (!validId && !advice) return null;
+    return { id: validId, advice: advice || null };
   }
 
-  async function loadShared(id) {
+  async function loadShared(shared) {
     busy = true;
     stopIdle();
     hint.classList.remove('error');
     hint.textContent = 'Unwrapping shared wisdom...';
     mist.classList.add('show');
-    try {
-      const slip = await fetchSlip('https://api.adviceslip.com/advice/' + id);
-      revealAdvice(slip.advice, id);
-      hint.textContent = 'Shared with you ✨ shake for your own 🎱';
-      // show-then-release: only strip the param once it's actually shown,
-      // so a failed load keeps ?id and a refresh can retry the shared link
-      history.replaceState(null, '', location.pathname);
-    } catch (err) {
-      showError('Could not reach the shared wisdom. Refresh to try again.');
+
+    // If we have an id, try to fetch the authentic slip first.
+    if (shared.id) {
+      try {
+        const slip = await fetchSlip('https://api.adviceslip.com/advice/' + shared.id);
+        revealAdvice(slip.advice, shared.id);
+        hint.textContent = 'Shared with you ✨ shake for your own 🎱';
+        history.replaceState(null, '', location.pathname);
+        return;
+      } catch (err) {
+        // fall through to the embedded text below
+      }
     }
+
+    // Fallback (or no id): show the text carried in the link itself.
+    if (shared.advice) {
+      revealAdvice(fixEncoding(shared.advice), shared.id);
+      hint.textContent = 'Shared with you ✨ shake for your own 🎱';
+      history.replaceState(null, '', location.pathname);
+      return;
+    }
+
+    // Only reachable when we had an id, no embedded text, and the fetch failed.
+    showError('Could not reach the shared wisdom. Refresh to try again.');
+    busy = false;
   }
 
   // --- Theme switching (auto / light / dark) ---
@@ -951,8 +977,8 @@
   });
 
   // On load: if opened from a share link, show that exact advice
-  const sharedId = getSharedId();
-  if (sharedId) loadShared(sharedId);
+  const shared = getShared();
+  if (shared) loadShared(shared);
 </script>
 </body>
 </html>
