@@ -261,66 +261,32 @@
     100% { transform: rotate(-360deg) scale(1.1); }
   }
 
-  /* History nav arrows, recessed into dimples at the ball's left/right edges */
-  .nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 44px;
-    height: 44px;
+  /* History nav chevrons — flank the hint line below the ball */
+  .hint-row {
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1;
+    gap: 12px;
+  }
+  .nav-btn {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: none;
     background: transparent;
-    color: #b8c2cf;
+    color: var(--text);
     cursor: pointer;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease, color 0.2s ease, transform 0.1s ease;
-    z-index: 2;
+    transition: opacity 0.25s ease, color 0.2s ease, transform 0.1s ease;
   }
-  .nav-prev { left: 11%; }
-  .nav-next { left: 89%; }
-  .nav-btn::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    --dimple-accent: transparent;
-    background: radial-gradient(circle at 60% 65%, #16161b 0%, #070709 80%);
-    box-shadow:
-      inset 3px 4px 8px rgba(0, 0, 0, 0.9),
-      inset -2px -3px 7px rgba(255, 255, 255, 0.09),
-      inset 0 0 9px var(--dimple-accent),
-      0 1px 1px rgba(255, 255, 255, 0.06);
-    z-index: -1;
-    transition: box-shadow 0.2s ease;
-  }
-  .nav-btn svg {
-    position: relative;
-    z-index: 1;
-    display: block;
-    width: 20px;
-    height: 20px;
-    transition: filter 0.2s ease;
-  }
-  .nav-btn.show {
-    opacity: 0.7;
-    pointer-events: auto;
-  }
-  .nav-btn:hover {
-    opacity: 1;
-    color: #f3e8ff;
-  }
-  .nav-btn:hover svg { filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.9)); }
-  .nav-btn:hover::before { --dimple-accent: rgba(168, 85, 247, 0.35); }
-  .nav-btn:active { transform: translate(-50%, -50%) scale(0.92); }
+  .nav-btn svg { width: 26px; height: 18px; display: block; }
+  .nav-btn.show { opacity: 0.5; pointer-events: auto; }
+  .nav-btn:hover { opacity: 1; color: var(--accent); }
+  .nav-btn:active { transform: scale(0.88); }
 
   /* Shake animation */
   @keyframes shake {
@@ -574,18 +540,20 @@
         <div class="mist" id="mist"></div>
         <div class="advice-text idle" id="advice" aria-live="polite" aria-atomic="true"><span id="adviceInner">8</span></div>
       </div>
-      <button class="nav-btn nav-prev" id="navPrev" title="Older advice" aria-label="Older advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 l7 7"/></svg></button>
-      <button class="nav-btn nav-next" id="navNext" title="Newer advice" aria-label="Newer advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 l-7 7"/></svg></button>
     </div>
     <div class="gloss"></div>
   </div>
 
-  <div class="hint" id="hint" role="status" aria-live="polite">Click the ball 🎱</div>
+  <div class="hint-row">
+    <button class="nav-btn nav-prev" id="navPrev" title="Older advice" aria-label="Older advice"><svg viewBox="0 0 34 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 l7 7 M24 5 L17 12 l7 7"/></svg></button>
+    <div class="hint" id="hint" role="status" aria-live="polite">Click the ball 🎱</div>
+    <button class="nav-btn nav-next" id="navNext" title="Newer advice" aria-label="Newer advice"><svg viewBox="0 0 34 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5 L17 12 l-7 7 M19 5 L26 12 l-7 7"/></svg></button>
+  </div>
 
   <footer class="credit">
     Advice courtesy of the
     <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>.
-    <span class="ver">v1.9.1</span>
+    <span class="ver">v1.9.5</span>
   </footer>
 
 <script>
@@ -706,6 +674,7 @@
   function displayItem(item) {
     ball.classList.remove('idle');
     adviceEl.classList.remove('idle', 'leaving', 'broken');
+    hint.classList.remove('error');
     mist.classList.remove('show');
     currentAdvice = item.advice;
     currentSlipId = (item.id != null) ? item.id : null;
