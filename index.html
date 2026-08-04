@@ -261,14 +261,13 @@
     100% { transform: rotate(-360deg) scale(1.1); }
   }
 
-  /* Copy icon recessed into a dimple on the ball, at 5 o'clock */
-  .copy-btn {
+  /* History nav arrows, recessed into dimples at the ball's left/right edges */
+  .nav-btn {
     position: absolute;
-    top: 84%;
-    left: 70%;
+    top: 50%;
     transform: translate(-50%, -50%);
-    width: 47px;
-    height: 47px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -282,8 +281,9 @@
     transition: opacity 0.3s ease, color 0.2s ease, transform 0.1s ease;
     z-index: 2;
   }
-  /* the dimple well itself */
-  .copy-btn::before {
+  .nav-prev { left: 11%; }
+  .nav-next { left: 89%; }
+  .nav-btn::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -302,31 +302,25 @@
     z-index: -1;
     transition: box-shadow 0.2s ease;
   }
-  .copy-btn svg {
+  .nav-btn svg {
     position: relative;
     z-index: 1;
     display: block;
-    width: 19px;
-    height: 19px;
+    width: 20px;
+    height: 20px;
     transition: filter 0.2s ease;
   }
-  .copy-btn.show {
+  .nav-btn.show {
     opacity: 0.7;
     pointer-events: auto;
   }
-  .copy-btn:hover {
+  .nav-btn:hover {
     opacity: 1;
     color: #f3e8ff;
   }
-  .copy-btn:hover svg { filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.9)); }
-  .copy-btn:hover::before { --dimple-accent: rgba(168, 85, 247, 0.35); }
-  .copy-btn:active { transform: translate(-50%, -50%) scale(0.92); }
-  .copy-btn.copied {
-    opacity: 1;
-    color: #86efac;
-  }
-  .copy-btn.copied svg { filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.9)); }
-  .copy-btn.copied::before { --dimple-accent: rgba(34, 197, 94, 0.4); }
+  .nav-btn:hover svg { filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.9)); }
+  .nav-btn:hover::before { --dimple-accent: rgba(168, 85, 247, 0.35); }
+  .nav-btn:active { transform: translate(-50%, -50%) scale(0.92); }
 
   /* Shake animation */
   @keyframes shake {
@@ -385,11 +379,8 @@
   .theme-switch svg { width: 17px; height: 17px; }
 
   /* Prominent Share button, top-left — matches the theme pill's height */
+  .share-wrap { position: fixed; top: 16px; left: 16px; z-index: 10; }
   .share-btn {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    z-index: 10;
     height: 42px;
     display: flex;
     align-items: center;
@@ -411,13 +402,43 @@
     background: rgba(168, 85, 247, 0.14);
   }
   .share-btn:active { transform: scale(0.96); }
-  .share-btn.copied {
-    color: #86efac;
-    background: rgba(34, 197, 94, 0.14);
-    border-color: rgba(134, 239, 172, 0.5);
-  }
   .share-btn svg { width: 17px; height: 17px; }
-  /* Collapse to an icon only on very narrow screens */
+
+  /* Dropdown menu under the Share pill */
+  .share-menu {
+    margin-top: 8px;
+    min-width: 160px;
+    padding: 6px;
+    border-radius: 12px;
+    background: var(--chip-bg);
+    border: 1px solid var(--chip-border);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .share-menu[hidden] { display: none; }
+  .share-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+    opacity: 0.9;
+    transition: background 0.15s ease, opacity 0.15s ease;
+  }
+  .share-item:hover { opacity: 1; background: rgba(168, 85, 247, 0.16); }
+  .share-item svg { width: 17px; height: 17px; flex: 0 0 auto; }
+  .share-item:disabled { opacity: 0.4; cursor: default; }
+  .share-item:disabled:hover { background: transparent; opacity: 0.4; }
+
+  /* Collapse the pill to an icon only on very narrow screens */
   @media (max-width: 360px) {
     .share-label { display: none; }
     .share-btn { padding: 0; width: 42px; justify-content: center; }
@@ -507,10 +528,22 @@
 </style>
 </head>
 <body>
-  <button class="share-btn" id="shareBtn" title="Share this advice" aria-label="Share">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 3.97M15.4 6.5l-6.8 3.97"/></svg>
-    <span class="share-label" id="shareLabel">Share</span>
-  </button>
+  <div class="share-wrap">
+    <button class="share-btn" id="shareBtn" title="Share or copy" aria-label="Share or copy" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 3.97M15.4 6.5l-6.8 3.97"/></svg>
+      <span class="share-label" id="shareLabel">Share</span>
+    </button>
+    <div class="share-menu" id="shareMenu" hidden role="menu">
+      <button class="share-item" id="menuShare" role="menuitem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 3.97M15.4 6.5l-6.8 3.97"/></svg>
+        Share link
+      </button>
+      <button class="share-item" id="menuCopy" role="menuitem" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M6 15 H5 a2 2 0 0 1 -2 -2 V5 a2 2 0 0 1 2 -2 h8 a2 2 0 0 1 2 2 v1"/></svg>
+        Copy advice
+      </button>
+    </div>
+  </div>
 
   <div class="theme-switch" role="group" aria-label="Theme and options">
     <button data-theme-choice="auto" title="Match system theme" aria-label="System theme">
@@ -525,10 +558,7 @@
     <span class="ts-sep" aria-hidden="true"></span>
     <button class="dev-toggle" id="devToggle" title="Test / debug options" aria-label="Debug options" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V15z"/></svg></button>
     <div class="dev-panel" id="devPanel" hidden>
-      <div class="dev-title">Features</div>
-      <label><input type="checkbox" id="copyDesktop"> Copy button (desktop)</label>
-      <label><input type="checkbox" id="copyMobile"> Copy button (mobile)</label>
-      <div class="dev-title dev-title--spaced">Test mode</div>
+      <div class="dev-title">Test mode</div>
       <label><input type="radio" name="testmode" value="off" checked> Normal</label>
       <label><input type="radio" name="testmode" value="network"> Force network error</label>
       <label><input type="radio" name="testmode" value="http"> Force HTTP 500</label>
@@ -544,7 +574,8 @@
         <div class="mist" id="mist"></div>
         <div class="advice-text idle" id="advice" aria-live="polite" aria-atomic="true"><span id="adviceInner">8</span></div>
       </div>
-      <button class="copy-btn" id="copyBtn" title="Copy advice" aria-label="Copy advice"></button>
+      <button class="nav-btn nav-prev" id="navPrev" title="Older advice" aria-label="Older advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 l7 7"/></svg></button>
+      <button class="nav-btn nav-next" id="navNext" title="Newer advice" aria-label="Newer advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 l-7 7"/></svg></button>
     </div>
     <div class="gloss"></div>
   </div>
@@ -554,7 +585,7 @@
   <footer class="credit">
     Advice courtesy of the
     <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>.
-    <span class="ver">v1.8.0</span>
+    <span class="ver">v1.9.1</span>
   </footer>
 
 <script>
@@ -562,16 +593,24 @@
   const adviceEl = document.getElementById('advice');
   const adviceInner = document.getElementById('adviceInner');
   const hint = document.getElementById('hint');
-  const copyBtn = document.getElementById('copyBtn');
   const mist = document.getElementById('mist');
   const shareBtn = document.getElementById('shareBtn');
-  const shareLabel = document.getElementById('shareLabel');
+  const shareMenu = document.getElementById('shareMenu');
+  const navPrev = document.getElementById('navPrev');
+  const navNext = document.getElementById('navNext');
+  const menuCopy = document.getElementById('menuCopy');
   let busy = false;
   let currentAdvice = '';
   let currentSlipId = null;
   let copyResetTimer = null;
-  let shareResetTimer = null;
   let hintBeforeCopy = null;
+  let hintFeedbackActive = false;
+
+  // --- Advice history (persists across reloads) ---
+  const HISTORY_KEY = 'rm8_history';
+  const HISTORY_MAX = 50;
+  let adviceHistory = [];
+  let histIdx = 0; // index of displayed item; === length means idle/live (no item shown)
 
   // Timing / resilience (ms) — tweak the app's "feel" and reliability here
   const REVEAL_DELAY = 650;      // min time the mist swirls before revealing
@@ -596,13 +635,9 @@
     }
   }
 
-  const ICON_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M6 15 H5 a2 2 0 0 1 -2 -2 V5 a2 2 0 0 1 2 -2 h8 a2 2 0 0 1 2 2 v1"/></svg>';
-  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 L9 17 l-5 -5"/></svg>';
-  const ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 L6 18 M6 6 l12 12"/></svg>';
   const ASCII_ERROR = '(x_x)';
   const COPIED_MSG = 'Copied to clipboard!';
   const COPY_FAIL_MSG = 'Copy failed. Select the text manually.';
-  copyBtn.innerHTML = ICON_COPY;
 
   const LOADING_MESSAGES = [
     'Consulting the cosmos...',
@@ -661,20 +696,73 @@
     }
   }
 
-  // Reveals a piece of advice (mist out, text in, copy available)
-  function revealAdvice(advice, slipId) {
-    mist.classList.remove('show');
-    currentAdvice = advice;
-    currentSlipId = (slipId !== undefined && slipId !== null) ? slipId : null;
-    adviceEl.classList.remove('broken');
-    setAdvice(advice);
-    adviceEl.classList.add('show');
-    if (copyEnabled) copyBtn.classList.add('show');
-    hint.textContent = pick(REVEAL_MESSAGES);
-    busy = false;
+  // Enables/disables the menu's "Copy advice" based on whether real advice is shown
+  function syncCopyState(hasAdvice) {
+    menuCopy.disabled = !hasAdvice;
   }
 
-  // Shows an ASCII "the oracle shrugs" in the window and an error message
+  // Puts a stored advice item into the window (no fetch, no mist). Used by both
+  // fresh reveals and history navigation. Sets current* so share/copy target it.
+  function displayItem(item) {
+    ball.classList.remove('idle');
+    adviceEl.classList.remove('idle', 'leaving', 'broken');
+    mist.classList.remove('show');
+    currentAdvice = item.advice;
+    currentSlipId = (item.id != null) ? item.id : null;
+    setAdvice(item.advice);
+    adviceEl.classList.add('show');
+    syncCopyState(true);
+    updateArrows();
+  }
+
+  // Shows/hides the history arrows based on where we are in the timeline.
+  function updateArrows() {
+    navPrev.classList.toggle('show', !busy && histIdx > 0);
+    navNext.classList.toggle('show', !busy && histIdx < adviceHistory.length - 1);
+  }
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          adviceHistory = arr.filter((x) => x && typeof x.advice === 'string')
+                             .map((x) => ({ advice: x.advice, id: (x.id != null) ? x.id : null }));
+        }
+      }
+    } catch (_) {}
+    if (adviceHistory.length > HISTORY_MAX) adviceHistory = adviceHistory.slice(-HISTORY_MAX);
+    histIdx = adviceHistory.length; // idle/live position (nothing shown yet)
+  }
+  function saveHistory() {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(adviceHistory.slice(-HISTORY_MAX))); } catch (_) {}
+  }
+
+  function goOlder() {
+    if (histIdx > 0) { histIdx--; hintFeedbackActive = false; displayItem(adviceHistory[histIdx]); hint.textContent = 'A nugget from before 🎱'; }
+  }
+  function goNewer() {
+    if (histIdx < adviceHistory.length - 1) {
+      histIdx++; hintFeedbackActive = false; displayItem(adviceHistory[histIdx]);
+      hint.textContent = (histIdx === adviceHistory.length - 1) ? 'Back to the latest 🎱' : 'A nugget from before 🎱';
+    }
+  }
+
+  // Reveals a freshly-fetched piece of advice: append to history, jump to it.
+  function revealAdvice(advice, slipId) {
+    const item = { advice, id: (slipId != null) ? slipId : null };
+    adviceHistory.push(item);
+    if (adviceHistory.length > HISTORY_MAX) adviceHistory = adviceHistory.slice(-HISTORY_MAX);
+    histIdx = adviceHistory.length - 1;
+    saveHistory();
+    busy = false;
+    displayItem(item);
+    hint.textContent = pick(REVEAL_MESSAGES);
+  }
+
+  // Shows an ASCII "the oracle shrugs" in the window and an error message.
+  // Errors are NOT added to history.
   function showError(msg) {
     mist.classList.remove('show');
     adviceEl.classList.add('broken');
@@ -683,9 +771,11 @@
     hint.textContent = msg;
     hint.classList.add('error');
     busy = false;
+    syncCopyState(false);
+    updateArrows();
   }
 
-  // Stops the first-load "attract" cues (breathing glow + pulsing 8)
+  // Stops the first-load "attract" cues (breathing glow + faint 8)
   function stopIdle() {
     ball.classList.remove('idle');
     adviceEl.classList.remove('idle');
@@ -694,6 +784,7 @@
   async function shake() {
     if (busy) return;
     busy = true;
+    hintFeedbackActive = false;
     ball.classList.remove('idle');
     hint.classList.remove('error');
     hint.textContent = pick(LOADING_MESSAGES);
@@ -705,7 +796,7 @@
     }
     // fade out current text and start shaking
     adviceEl.classList.remove('show', 'broken');
-    copyBtn.classList.remove('show');
+    updateArrows();
     mist.classList.add('show');
     ball.classList.remove('shaking');
     void ball.offsetWidth; // reflow to restart animation
@@ -733,6 +824,13 @@
   // glow), but the faint 8 stays until the first shake
   ball.addEventListener('pointerenter', () => ball.classList.remove('idle'), { once: true });
 
+  // History arrows — navigate without shaking; stop the click reaching the ball
+  navPrev.addEventListener('click', (e) => { e.stopPropagation(); goOlder(); });
+  navNext.addEventListener('click', (e) => { e.stopPropagation(); goNewer(); });
+  [navPrev, navNext].forEach((b) => b.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); }
+  }));
+
   // --- Debug / test modes (hidden; toggle with Ctrl+Shift+D) ---
   let testMode = 'off';
   const themeSwitch = document.querySelector('.theme-switch');
@@ -756,22 +854,6 @@
   document.querySelectorAll('input[name="testmode"]').forEach((r) => {
     r.addEventListener('change', () => { testMode = r.value; });
   });
-
-  // Copy button visibility, controlled per-environment from the dev menu.
-  // Desktop defaults ON (its share sheet often can't select text); mobile OFF.
-  const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const copyDesktop = document.getElementById('copyDesktop');
-  const copyMobile = document.getElementById('copyMobile');
-  copyDesktop.checked = true;
-  copyMobile.checked = false;
-  let copyEnabled = isDesktop ? copyDesktop.checked : copyMobile.checked;
-  function updateCopyVisibility() {
-    copyEnabled = isDesktop ? copyDesktop.checked : copyMobile.checked;
-    if (copyEnabled && currentAdvice) copyBtn.classList.add('show');
-    else copyBtn.classList.remove('show');
-  }
-  copyDesktop.addEventListener('change', updateCopyVisibility);
-  copyMobile.addEventListener('change', updateCopyVisibility);
 
   // A single network attempt for a given URL. Honors the debug test modes
   // and aborts via the passed signal (per-attempt timeout).
@@ -832,40 +914,29 @@
     } catch (_) { return false; }
   }
 
-  async function copyAdvice(e) {
-    // Stop the click from bubbling to the ball (which would shake + refetch)
-    e.stopPropagation();
-    if (!currentAdvice) return;
-
-    const ok = await copyText(currentAdvice);
+  // Shows a transient feedback message in the hint line, then fades back to
+  // whatever was there before.
+  function showHintFeedback(msg) {
     clearTimeout(copyResetTimer);
-    const feedback = ok ? COPIED_MSG : COPY_FAIL_MSG;
-    // Remember the message to restore (but don't capture our own feedback on rapid re-clicks)
-    if (hint.textContent !== COPIED_MSG && hint.textContent !== COPY_FAIL_MSG) {
-      hintBeforeCopy = hint.textContent;
-    }
-    copyBtn.innerHTML = ok ? ICON_CHECK : ICON_X;
-    copyBtn.classList.toggle('copied', ok);
-    hint.textContent = feedback;
+    if (!hintFeedbackActive) hintBeforeCopy = hint.textContent;
+    hintFeedbackActive = true;
+    hint.textContent = msg;
     copyResetTimer = setTimeout(() => {
-      copyBtn.innerHTML = ICON_COPY;
-      copyBtn.classList.remove('copied');
-      // Fade the copy feedback out, swap in the prior message, fade back in
-      if (hint.textContent === feedback && hintBeforeCopy !== null) {
-        hint.classList.add('fading');
-        setTimeout(() => {
-          if (hint.textContent === feedback) hint.textContent = hintBeforeCopy;
-          hint.classList.remove('fading');
-        }, 300);
-      }
+      if (hint.textContent !== msg) { hintFeedbackActive = false; return; }
+      hint.classList.add('fading');
+      setTimeout(() => {
+        if (hint.textContent === msg && hintBeforeCopy !== null) hint.textContent = hintBeforeCopy;
+        hint.classList.remove('fading');
+        hintFeedbackActive = false;
+      }, 300);
     }, COPY_RESET);
   }
 
-  copyBtn.addEventListener('click', copyAdvice);
-  // Guard against keyboard activation bubbling to the ball too
-  copyBtn.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); }
-  });
+  async function copyCurrentAdvice() {
+    if (!currentAdvice) return;
+    const ok = await copyText(currentAdvice);
+    showHintFeedback(ok ? COPIED_MSG : COPY_FAIL_MSG);
+  }
 
   // --- Sharing: link carries the slip id (authentic) AND the text (fallback,
   // so the recipient always sees the advice even if the API can't be reached).
@@ -891,17 +962,29 @@
       try { await navigator.share(data); return; }
       catch (err) { if (err && err.name === 'AbortError') return; /* else fall back */ }
     }
-    // Fallback: copy the advice + link to the clipboard
+    // Fallback (e.g. desktop with no share sheet): copy the advice + link.
     const ok = await copyText(data.text + ' ' + data.url);
-    clearTimeout(shareResetTimer);
-    shareBtn.classList.add('copied');
-    shareLabel.textContent = ok ? 'Link copied!' : 'Copy failed';
-    shareResetTimer = setTimeout(() => {
-      shareBtn.classList.remove('copied');
-      shareLabel.textContent = 'Share';
-    }, COPY_RESET);
+    showHintFeedback(ok ? 'Link copied to clipboard!' : 'Copy failed. Try again.');
   }
-  shareBtn.addEventListener('click', shareAdvice);
+
+  // --- Share pill acts as a small menu (Share link / Copy advice) ---
+  function closeShareMenu() {
+    shareMenu.setAttribute('hidden', '');
+    shareBtn.setAttribute('aria-expanded', 'false');
+  }
+  function toggleShareMenu() {
+    const open = shareMenu.hasAttribute('hidden');
+    if (open) { shareMenu.removeAttribute('hidden'); shareBtn.setAttribute('aria-expanded', 'true'); }
+    else { closeShareMenu(); }
+  }
+  shareBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleShareMenu(); });
+  document.getElementById('menuShare').addEventListener('click', () => { closeShareMenu(); shareAdvice(); });
+  document.getElementById('menuCopy').addEventListener('click', () => { closeShareMenu(); copyCurrentAdvice(); });
+  // Close the menu on outside click or Escape
+  document.addEventListener('click', (e) => {
+    if (!shareMenu.hasAttribute('hidden') && !e.target.closest('.share-wrap')) closeShareMenu();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeShareMenu(); });
 
   // --- Open a shared link ---
   // Reads ?id= and/or ?advice= from the URL. Returns null if neither present.
@@ -944,7 +1027,6 @@
 
     // Only reachable when we had an id, no embedded text, and the fetch failed.
     showError('Could not reach the shared wisdom. Refresh to try again.');
-    busy = false;
   }
 
   // --- Theme switching (auto / light / dark) ---
@@ -976,7 +1058,9 @@
     }, 150);
   });
 
-  // On load: if opened from a share link, show that exact advice
+  // On load: restore history, then if opened from a share link show that advice
+  loadHistory();
+  updateArrows();
   const shared = getShared();
   if (shared) loadShared(shared);
 </script>
