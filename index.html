@@ -272,36 +272,51 @@
     min-height: 1.5em;
   }
   .nav-row.show { display: flex; }
-  .nav-count {
-    font-size: 0.82rem;
-    opacity: 0.5;
-    min-width: 2.8em;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-  }
-  .nav-btn {
-    flex: 0 0 auto;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+  .nav-dots {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--chip-bg);
-    border: 1px solid var(--chip-border);
+    gap: 6px;
+    min-width: 2.8em;
+    height: 18px;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text);
+    opacity: 0.28;
+    transition: width 0.25s ease, opacity 0.25s ease, transform 0.25s ease, background 0.25s ease;
+  }
+  .dot.on {
+    width: 18px;
+    border-radius: 4px;
+    opacity: 0.9;
+    background: var(--accent);
+  }
+  .dot.edge1 { transform: scale(0.72); opacity: 0.2; }
+  .dot.edge2 { transform: scale(0.48); opacity: 0.14; }
+  .nav-btn {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
     color: var(--text);
     cursor: pointer;
-    opacity: 0.55;
-    backdrop-filter: blur(6px);
-    transition: opacity 0.25s ease, color 0.2s ease, transform 0.1s ease, background 0.2s ease;
+    opacity: 0.5;
+    transition: opacity 0.25s ease, color 0.2s ease, transform 0.1s ease;
   }
-  .nav-btn svg { width: 16px; height: 16px; display: block; }
-  .nav-btn:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
+  .nav-btn svg { width: 20px; height: 20px; display: block; }
+  .nav-btn:disabled { opacity: 0.18; cursor: default; pointer-events: none; }
   .nav-btn:not(:disabled):hover { opacity: 1; color: var(--accent); }
-  .nav-btn:not(:disabled):active { transform: scale(0.9); }
+  .nav-btn:not(:disabled):active { transform: scale(0.85); }
   /* During a shake, hide the row's contents but keep its reserved height */
   .nav-row.busy .nav-btn,
-  .nav-row.busy .nav-count { visibility: hidden; }
+  .nav-row.busy .nav-dots { visibility: hidden; }
 
   /* Shake animation */
   @keyframes shake {
@@ -591,7 +606,7 @@
 
   <div class="nav-row" id="navRow">
     <button class="nav-btn nav-prev" id="navPrev" title="Older advice" aria-label="Older advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6 L8 12 l6 6"/></svg></button>
-    <span class="nav-count" id="navCount"></span>
+    <span class="nav-dots" id="navDots"></span>
     <button class="nav-btn nav-next" id="navNext" title="Newer advice" aria-label="Newer advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6 L16 12 l-6 6"/></svg></button>
   </div>
 
@@ -602,7 +617,7 @@
     <div class="info-pop" id="infoPop" hidden>
       Advice courtesy of the
       <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>
-    <span class="ver">v1.9.14</span>
+    <span class="ver">v1.9.16</span>
     </div>
   </div>
 
@@ -617,7 +632,7 @@
   const navPrev = document.getElementById('navPrev');
   const navNext = document.getElementById('navNext');
   const navRow = document.getElementById('navRow');
-  const navCount = document.getElementById('navCount');
+  const navDots = document.getElementById('navDots');
   const menuCopy = document.getElementById('menuCopy');
   let busy = false;
   let currentAdvice = '';
@@ -736,21 +751,44 @@
     updateArrows();
   }
 
-  // Shows/hides the nav row and updates the "pos / total" counter.
+  // Shows/hides the nav row and rebuilds the dot page-control.
   function updateArrows() {
     const n = adviceHistory.length;
-    // Show the whole row (numbers + chevrons) whenever there's any history.
+    // Show the whole row (dots + chevrons) whenever there's any history.
     navRow.classList.toggle('show', n >= 1);
     // While shaking, hide the contents (like before) but keep the space.
     navRow.classList.toggle('busy', busy);
     // Both arrows always render; grey out the one that can't move.
     navPrev.disabled = busy || histIdx <= 0;
     navNext.disabled = busy || histIdx >= n - 1;
-    // Counter always shows when there's history; idle clamps to the newest.
-    if (!busy && n >= 1) {
-      const idx = Math.min(histIdx, n - 1);
-      navCount.textContent = (idx + 1) + ' / ' + n;
+    if (!busy && n >= 1) renderDots();
+  }
+
+  // iOS-style page control: one dot per history item, active one elongates.
+  // When there are more items than fit, the window slides and edge dots shrink.
+  const DOT_WINDOW = 7;
+  function renderDots() {
+    const n = adviceHistory.length;
+    const active = Math.min(histIdx, n - 1); // idle clamps to the newest
+    let start = 0, end = n;
+    if (n > DOT_WINDOW) {
+      start = Math.max(0, Math.min(active - Math.floor(DOT_WINDOW / 2), n - DOT_WINDOW));
+      end = start + DOT_WINDOW;
     }
+    const leftMore = start > 0;
+    const rightMore = end < n;
+    const frag = document.createDocumentFragment();
+    for (let i = start; i < end; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      if (i === active) dot.classList.add('on');
+      else if (leftMore && i === start) dot.classList.add('edge2');
+      else if (leftMore && i === start + 1) dot.classList.add('edge1');
+      else if (rightMore && i === end - 1) dot.classList.add('edge2');
+      else if (rightMore && i === end - 2) dot.classList.add('edge1');
+      frag.appendChild(dot);
+    }
+    navDots.replaceChildren(frag);
   }
 
   function loadHistory() {
