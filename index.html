@@ -267,7 +267,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    gap: 14px;
+    gap: 6px;
     margin-top: 10px;
     min-height: 1.5em;
   }
@@ -275,28 +275,30 @@
   .nav-count {
     font-size: 0.82rem;
     opacity: 0.5;
-    min-width: 3.4em;
+    min-width: 2.8em;
     text-align: center;
     font-variant-numeric: tabular-nums;
   }
   .nav-btn {
     flex: 0 0 auto;
-    width: 34px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    background: transparent;
+    background: var(--chip-bg);
+    border: 1px solid var(--chip-border);
     color: var(--text);
     cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.25s ease, color 0.2s ease, transform 0.1s ease;
+    opacity: 0.55;
+    backdrop-filter: blur(6px);
+    transition: opacity 0.25s ease, color 0.2s ease, transform 0.1s ease, background 0.2s ease;
   }
-  .nav-btn svg { width: 26px; height: 18px; display: block; }
-  .nav-btn:disabled { opacity: 0.15; cursor: default; pointer-events: none; }
+  .nav-btn svg { width: 16px; height: 16px; display: block; }
+  .nav-btn:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
   .nav-btn:not(:disabled):hover { opacity: 1; color: var(--accent); }
-  .nav-btn:not(:disabled):active { transform: scale(0.88); }
+  .nav-btn:not(:disabled):active { transform: scale(0.9); }
   /* During a shake, hide the row's contents but keep its reserved height */
   .nav-row.busy .nav-btn,
   .nav-row.busy .nav-count { visibility: hidden; }
@@ -588,9 +590,9 @@
   <div class="hint" id="hint" role="status" aria-live="polite">Click the ball 🎱</div>
 
   <div class="nav-row" id="navRow">
-    <button class="nav-btn nav-prev" id="navPrev" title="Older advice" aria-label="Older advice"><svg viewBox="0 0 34 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 l7 7 M24 5 L17 12 l7 7"/></svg></button>
+    <button class="nav-btn nav-prev" id="navPrev" title="Older advice" aria-label="Older advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6 L8 12 l6 6"/></svg></button>
     <span class="nav-count" id="navCount"></span>
-    <button class="nav-btn nav-next" id="navNext" title="Newer advice" aria-label="Newer advice"><svg viewBox="0 0 34 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5 L17 12 l-7 7 M19 5 L26 12 l-7 7"/></svg></button>
+    <button class="nav-btn nav-next" id="navNext" title="Newer advice" aria-label="Newer advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6 L16 12 l-6 6"/></svg></button>
   </div>
 
   <div class="info-wrap">
@@ -600,7 +602,7 @@
     <div class="info-pop" id="infoPop" hidden>
       Advice courtesy of the
       <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>
-    <span class="ver">v1.9.12</span>
+    <span class="ver">v1.9.14</span>
     </div>
   </div>
 
