@@ -309,7 +309,7 @@
     color: var(--text);
     cursor: pointer;
     opacity: 0.5;
-    transition: opacity 0.25s ease, color 0.2s ease, transform 0.1s ease;
+    transition: opacity 0.3s ease, color 0.35s ease, transform 0.1s ease;
   }
   /* Invisible expanded hit area (feels like "<<<>>>") so taps don't miss.
      Absolutely positioned, so it enlarges the target without shifting layout. */
@@ -320,8 +320,14 @@
   }
   .nav-btn svg { width: 20px; height: 20px; display: block; }
   .nav-btn:disabled { opacity: 0.18; cursor: default; pointer-events: none; }
-  .nav-btn:not(:disabled):hover { opacity: 1; color: var(--accent); }
+  /* Hover accent only on devices with a real pointer, so touch taps don't
+     latch the purple "sticky hover" state. */
+  @media (hover: hover) {
+    .nav-btn:not(:disabled):hover { opacity: 1; color: var(--accent); }
+  }
   .nav-btn:not(:disabled):active { transform: scale(0.85); }
+  /* Brief accent flash on tap, then fades back via the color transition. */
+  .nav-btn.flash { opacity: 1; color: var(--accent); }
   /* During a shake, hide the row's contents but keep its reserved height */
   .nav-row.busy .nav-btn,
   .nav-row.busy .nav-dots { visibility: hidden; }
@@ -625,7 +631,7 @@
     <div class="info-pop" id="infoPop" hidden>
       Advice courtesy of the
       <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>
-    <span class="ver">v1.9.17</span>
+    <span class="ver">v1.9.18</span>
     </div>
   </div>
 
@@ -903,8 +909,14 @@
   ball.addEventListener('pointerenter', () => ball.classList.remove('idle'), { once: true });
 
   // History arrows — navigate without shaking; stop the click reaching the ball
-  navPrev.addEventListener('click', (e) => { e.stopPropagation(); goOlder(); });
-  navNext.addEventListener('click', (e) => { e.stopPropagation(); goNewer(); });
+  // Brief accent flash on tap, then it fades back via the CSS color transition
+  // (also clears any lingering emulated :hover state on touch devices).
+  function flashNav(btn) {
+    btn.classList.add('flash');
+    setTimeout(() => btn.classList.remove('flash'), 150);
+  }
+  navPrev.addEventListener('click', (e) => { e.stopPropagation(); flashNav(navPrev); goOlder(); });
+  navNext.addEventListener('click', (e) => { e.stopPropagation(); flashNav(navNext); goNewer(); });
   [navPrev, navNext].forEach((b) => b.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); }
   }));
