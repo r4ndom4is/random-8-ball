@@ -95,8 +95,8 @@
   }
   .ball {
     position: relative;
-    width: min(82vw, 400px);
-    height: min(82vw, 400px);
+    width: min(82vw, 400px, 66vh);
+    height: min(82vw, 400px, 66vh);
     border-radius: 50%;
     cursor: pointer;
     background:
@@ -261,12 +261,22 @@
     100% { transform: rotate(-360deg) scale(1.1); }
   }
 
-  /* History nav chevrons — flank the hint line below the ball */
-  .hint-row {
-    display: flex;
+  /* History carousel nav row, below the hint at the very bottom */
+  .nav-row {
+    display: none;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 14px;
+    margin-top: 10px;
+    min-height: 1.5em;
+  }
+  .nav-row.show { display: flex; }
+  .nav-count {
+    font-size: 0.82rem;
+    opacity: 0.5;
+    min-width: 3.4em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
   }
   .nav-btn {
     flex: 0 0 auto;
@@ -411,24 +421,50 @@
   }
 
   /* Footer credit */
-  .credit {
-    position: fixed;
-    bottom: 14px;
-    left: 0;
+  /* About / API-credit info button, bottom-right */
+  .info-wrap { position: fixed; bottom: 12px; right: 14px; z-index: 10; }
+  .info-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--chip-border);
+    background: var(--chip-bg);
+    color: var(--text);
+    opacity: 0.4;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+    transition: opacity 0.2s ease;
+  }
+  .info-btn:hover { opacity: 0.85; }
+  .info-btn svg { width: 16px; height: 16px; }
+  .info-pop {
+    position: absolute;
+    bottom: 40px;
     right: 0;
-    text-align: center;
-    font-size: 0.78rem;
-    opacity: 0.55;
-    padding: 0 16px;
-    transition: color 0.35s ease;
+    min-width: 220px;
+    padding: 11px 13px;
+    border-radius: 12px;
+    background: var(--chip-bg);
+    border: 1px solid var(--chip-border);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    text-align: left;
+    color: var(--text);
   }
-  .credit a {
-    color: var(--accent);
-    text-decoration: none;
-    border-bottom: 1px dotted currentColor;
+  .info-pop[hidden] { display: none; }
+  .info-pop a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted currentColor; }
+  .info-pop .ver { display: block; margin-top: 6px; opacity: 0.6; }
+
+  /* Short viewports (e.g. phone landscape): tighten so nothing overlaps */
+  @media (max-height: 520px) {
+    body { padding: 12px; }
+    .subtitle { display: none; }
+    h1 { font-size: clamp(1.1rem, 4vw, 1.6rem); margin-bottom: 2px; }
+    .ball-wrap { margin-bottom: 14px; }
+    .nav-row { margin-top: 6px; }
   }
-  .credit a:hover { opacity: 0.85; }
-  .credit .ver { margin-left: 5px; opacity: 0.75; }
 
   /* Debug gear lives inside the theme pill, revealed via Ctrl+Shift+D */
   .ts-sep {
@@ -544,17 +580,24 @@
     <div class="gloss"></div>
   </div>
 
-  <div class="hint-row">
+  <div class="hint" id="hint" role="status" aria-live="polite">Click the ball 🎱</div>
+
+  <div class="nav-row" id="navRow">
     <button class="nav-btn nav-prev" id="navPrev" title="Older advice" aria-label="Older advice"><svg viewBox="0 0 34 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 l7 7 M24 5 L17 12 l7 7"/></svg></button>
-    <div class="hint" id="hint" role="status" aria-live="polite">Click the ball 🎱</div>
+    <span class="nav-count" id="navCount"></span>
     <button class="nav-btn nav-next" id="navNext" title="Newer advice" aria-label="Newer advice"><svg viewBox="0 0 34 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5 L17 12 l-7 7 M19 5 L26 12 l-7 7"/></svg></button>
   </div>
 
-  <footer class="credit">
-    Advice courtesy of the
-    <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>.
-    <span class="ver">v1.9.5</span>
-  </footer>
+  <div class="info-wrap">
+    <button class="info-btn" id="infoBtn" title="About" aria-label="About" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.7" r="0.9" fill="currentColor" stroke="none"/></svg>
+    </button>
+    <div class="info-pop" id="infoPop" hidden>
+      Advice courtesy of the
+      <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>.
+    <span class="ver">v1.9.6</span>
+    </div>
+  </div>
 
 <script>
   const ball = document.getElementById('ball');
@@ -566,6 +609,8 @@
   const shareMenu = document.getElementById('shareMenu');
   const navPrev = document.getElementById('navPrev');
   const navNext = document.getElementById('navNext');
+  const navRow = document.getElementById('navRow');
+  const navCount = document.getElementById('navCount');
   const menuCopy = document.getElementById('menuCopy');
   let busy = false;
   let currentAdvice = '';
@@ -684,10 +729,18 @@
     updateArrows();
   }
 
-  // Shows/hides the history arrows based on where we are in the timeline.
+  // Shows/hides the nav row + arrows and updates the "pos / total" counter.
   function updateArrows() {
-    navPrev.classList.toggle('show', !busy && histIdx > 0);
-    navNext.classList.toggle('show', !busy && histIdx < adviceHistory.length - 1);
+    const n = adviceHistory.length;
+    const viewing = !busy && histIdx < n;      // currently on a stored item
+    const canOlder = viewing && histIdx > 0;
+    const canNewer = viewing && histIdx < n - 1;
+    navPrev.classList.toggle('show', canOlder);
+    navNext.classList.toggle('show', canNewer);
+    // The row appears only when there's actually more than one item to browse
+    const showRow = viewing && n > 1;
+    navRow.classList.toggle('show', showRow);
+    if (showRow) navCount.textContent = (histIdx + 1) + ' / ' + n;
   }
 
   function loadHistory() {
@@ -954,6 +1007,21 @@
     if (!shareMenu.hasAttribute('hidden') && !e.target.closest('.share-wrap')) closeShareMenu();
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeShareMenu(); });
+
+  // --- About / API-credit info popover (bottom-right) ---
+  const infoBtn = document.getElementById('infoBtn');
+  const infoPop = document.getElementById('infoPop');
+  function closeInfo() { infoPop.setAttribute('hidden', ''); infoBtn.setAttribute('aria-expanded', 'false'); }
+  infoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = infoPop.hasAttribute('hidden');
+    if (open) { infoPop.removeAttribute('hidden'); infoBtn.setAttribute('aria-expanded', 'true'); }
+    else { closeInfo(); }
+  });
+  document.addEventListener('click', (e) => {
+    if (!infoPop.hasAttribute('hidden') && !e.target.closest('.info-wrap')) closeInfo();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInfo(); });
 
   // --- Open a shared link ---
   // Reads ?id= and/or ?advice= from the URL. Returns null if neither present.
