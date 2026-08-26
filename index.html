@@ -277,16 +277,17 @@
     100% { transform: rotate(-360deg) scale(1.1); }
   }
 
-  /* History carousel nav row, below the hint at the very bottom */
+  /* History carousel nav row, below the hint at the very bottom.
+     Always occupies its height (space reserved) so the centered layout never
+     jumps when the carousel first appears — only its contents toggle. */
   .nav-row {
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
     margin-top: 10px;
     min-height: 1.5em;
   }
-  .nav-row.show { display: flex; }
   .nav-dots {
     display: flex;
     align-items: center;
@@ -343,7 +344,10 @@
   .nav-btn:not(:disabled):active { transform: scale(0.85); }
   /* Brief accent flash on tap, then fades back via the color transition. */
   .nav-btn.flash { opacity: 1; color: var(--accent); }
-  /* During a shake, hide the row's contents but keep its reserved height */
+  /* Hide the row's contents (keeping its reserved height) when there's nothing
+     to navigate yet, or during a shake. */
+  .nav-row:not(.show) .nav-btn,
+  .nav-row:not(.show) .nav-dots,
   .nav-row.busy .nav-btn,
   .nav-row.busy .nav-dots { visibility: hidden; }
 
@@ -646,7 +650,7 @@
     <div class="info-pop" id="infoPop" hidden>
       Advice courtesy of the
       <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>
-    <span class="ver">v1.10.2</span>
+    <span class="ver">v1.10.3</span>
     </div>
   </div>
 
