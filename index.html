@@ -93,7 +93,7 @@
      grows a bit more than the bottom, so the sparse area below the ball shrinks
      while the title gets airier breathing room above. Tune with --bias-top. */
   .v-spacer { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-height: 0; }
-  .v-spacer.top { flex-grow: 1.5; }
+  .v-spacer.top { flex-grow: 2.2; }
   h1 {
     font-weight: 700;
     font-size: clamp(1.4rem, 4vw, 2.2rem);
@@ -513,6 +513,9 @@
     .ball { width: min(82vw, 460px, 70vh); height: min(82vw, 460px, 70vh); }
     .ball-wrap { margin-top: 46px; margin-bottom: 46px; }
     .nav-row { margin-top: 16px; }
+    /* Gentler downward bias on the big desktop canvas (the top pills are tiny
+       relative to the viewport, so the strong mobile bias over-drops here). */
+    .v-spacer.top { flex-grow: 1.15; }
   }
 
   /* Debug gear lives inside the theme pill, revealed via Ctrl+Shift+D */
@@ -700,7 +703,7 @@
   const COPY_FAIL_MSG = 'Copy failed. Select the text manually.';
 
   // App version — single source of truth (shown in the hidden gear panel).
-  const APP_VERSION = 'v1.10.20';
+  const APP_VERSION = 'v1.10.22';
 
   // Rotating subtitle: the tagline and the API credit swap every 15s. The
   // tagline shows first, the API credit always comes second. The credit holds
