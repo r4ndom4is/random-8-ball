@@ -1,30 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <defs>
-    <radialGradient id="body" cx="32%" cy="28%" r="78%">
-      <stop offset="0%" stop-color="#565656"/>
-      <stop offset="52%" stop-color="#141414"/>
-      <stop offset="100%" stop-color="#000000"/>
-    </radialGradient>
-    <radialGradient id="win" cx="50%" cy="44%" r="62%">
-      <stop offset="0%" stop-color="#20409a"/>
-      <stop offset="55%" stop-color="#0b1e57"/>
-      <stop offset="100%" stop-color="#050d2e"/>
-    </radialGradient>
-    <radialGradient id="gloss" cx="31%" cy="24%" r="46%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
-      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.08"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <!-- Ball body, nearly full-bleed (little edge room) -->
-  <circle cx="32" cy="32" r="31" fill="url(#body)"/>
-  <!-- Rim shadow for volume -->
-  <circle cx="32" cy="32" r="31" fill="none" stroke="#000000" stroke-opacity="0.5" stroke-width="2"/>
-  <!-- Blue window -->
-  <circle cx="32" cy="32" r="15" fill="url(#win)"/>
-  <circle cx="32" cy="32" r="15" fill="none" stroke="#93c5fd" stroke-opacity="0.22" stroke-width="1"/>
+  <!-- Flat 8-ball, transparent bg, edge-to-edge (D2 style: white window, dark 8) -->
+  <circle cx="32" cy="32" r="31" fill="#0f0f14"/>
+  <!-- Faint rim so the black ball stays visible on dark browser tabs -->
+  <circle cx="32" cy="32" r="31" fill="none" stroke="#8b5cf6" stroke-opacity="0.55" stroke-width="1.5"/>
+  <!-- White window -->
+  <circle cx="32" cy="32" r="17.5" fill="#f4f0ff"/>
   <!-- The 8 -->
-  <text x="32" y="39.4" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="19" fill="#dbeafe">8</text>
-  <!-- Specular gloss on top -->
-  <circle cx="32" cy="32" r="31" fill="url(#gloss)"/>
+  <text x="32" y="41.4" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="26" fill="#1a1030">8</text>
 </svg>

@@ -4,7 +4,7 @@
      always wins when online; fall back to the cached copy only when offline.
    - Static assets (icons, manifest): cache-first for instant loads.
    Bump CACHE_VERSION whenever the cached asset list changes. */
-const CACHE_VERSION = 'rm8-v3';
+const CACHE_VERSION = 'rm8-v14';
 const ASSETS = [
   './',
   './index.html',

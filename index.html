@@ -31,7 +31,7 @@
     /* Dark-theme defaults — valid in every browser (no light-dark() needed) */
     --accent: #a855f7;
     --bg1: #1a1030;
-    --bg2: #2d1b4e;
+    --bg2: #1e1236;
     --text: #ffffff;
     --chip-bg: rgba(255, 255, 255, 0.08);
     --chip-border: rgba(255, 255, 255, 0.18);
@@ -43,7 +43,7 @@
       color-scheme: light dark;
       --accent: light-dark(#7c3aed, #a855f7);
       --bg1: light-dark(#d7cff0, #1a1030);
-      --bg2: light-dark(#f5f2fb, #2d1b4e);
+      --bg2: light-dark(#f5f2fb, #1e1236);
       --text: light-dark(#241640, #ffffff);
       --chip-bg: light-dark(rgba(45,27,78,0.06), rgba(255,255,255,0.08));
       --chip-border: light-dark(rgba(45,27,78,0.18), rgba(255,255,255,0.18));
@@ -57,15 +57,26 @@
     height: 100%;
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     color: var(--text);
-    background: radial-gradient(circle at 50% 30%, var(--bg2), var(--bg1) 70%);
+    background: radial-gradient(circle at 50% 34%, var(--bg2), var(--bg1) 58%);
     overflow: hidden;
     transition: background 0.35s ease, color 0.35s ease;
+  }
+  /* Fine grain overlay dithers away the radial-gradient banding (visible
+     concentric rings) that shows on the dark theme's low-contrast purples. */
+  .bg-grain {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: 0.06;
   }
   body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100vh;
     /* Respect the iOS notch / home indicator in standalone (installed) mode */
     padding:
@@ -76,12 +87,18 @@
     text-align: center;
     user-select: none;
   }
+  /* Flexible spacers give the content a gentle downward bias: the top spacer
+     grows a bit more than the bottom, so the sparse area below the ball shrinks
+     while the title gets airier breathing room above. Tune with --bias-top. */
+  .v-spacer { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-height: 0; }
+  .v-spacer.top { flex-grow: 1.5; }
   h1 {
     font-weight: 700;
     font-size: clamp(1.4rem, 4vw, 2.2rem);
     letter-spacing: 0.5px;
     margin-bottom: 6px;
     text-shadow: 0 2px 12px rgba(168, 85, 247, 0.6);
+    -webkit-touch-callout: none;
   }
   .subtitle {
     opacity: 0.7;
@@ -473,44 +490,10 @@
     .share-btn { padding: 0; width: 42px; justify-content: center; }
   }
 
-  /* Footer credit */
-  /* About / API-credit info button, bottom-right */
-  .info-wrap { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom)); right: calc(16px + env(safe-area-inset-right)); z-index: 10; }
-  .info-btn {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    border: 1px solid var(--chip-border);
-    background: var(--chip-bg);
-    color: var(--text);
-    opacity: 0.4;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(6px);
-    transition: opacity 0.2s ease;
-  }
-  .info-btn:hover { opacity: 0.85; }
-  .info-btn svg { width: 16px; height: 16px; }
-  .info-pop {
-    position: absolute;
-    bottom: 40px;
-    right: 0;
-    width: max-content;
-    max-width: 80vw;
-    white-space: nowrap;
-    padding: 11px 13px;
-    border-radius: 12px;
-    background: var(--chip-bg);
-    border: 1px solid var(--chip-border);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    font-size: 0.8rem;
-    line-height: 1.5;
-    text-align: left;
-    color: var(--text);
-  }
-  .info-pop[hidden] { display: none; }
-  .info-pop a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted currentColor; }
-  .info-pop .ver { display: block; margin-top: 6px; opacity: 0.6; }
+  /* Rotating subtitle (tagline <-> API credit) with a soft crossfade */
+  .subtitle { transition: opacity 0.25s ease; }
+  .subtitle.fading { opacity: 0; }
+  .subtitle a { color: var(--accent); text-decoration: none; }
 
   /* Short viewports (e.g. phone landscape): tighten so nothing overlaps */
   @media (max-height: 520px) {
@@ -519,6 +502,15 @@
     h1 { font-size: clamp(1.1rem, 4vw, 1.6rem); margin-bottom: 0; }
     .ball-wrap { margin-top: 14px; margin-bottom: 14px; }
     .nav-row { margin-top: 6px; }
+  }
+
+  /* Desktop / large screens: bigger ball + roomier vertical rhythm so the
+     stack doesn't feel like a tight cluster floating in empty space. */
+  @media (min-width: 1024px) and (min-height: 640px) {
+    h1 { font-size: clamp(1.6rem, 2.4vw, 2.5rem); margin-bottom: 12px; }
+    .ball { width: min(82vw, 460px, 70vh); height: min(82vw, 460px, 70vh); }
+    .ball-wrap { margin-top: 46px; margin-bottom: 46px; }
+    .nav-row { margin-top: 16px; }
   }
 
   /* Debug gear lives inside the theme pill, revealed via Ctrl+Shift+D */
@@ -582,9 +574,11 @@
     opacity: 0.9;
   }
   .dev-panel input { accent-color: var(--accent); cursor: pointer; }
+  .dev-ver { opacity: 0.7; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
+  <div class="bg-grain" aria-hidden="true"></div>
   <div class="share-wrap">
     <button class="share-btn" id="shareBtn" title="Share or copy" aria-label="Share or copy" aria-haspopup="true" aria-expanded="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 3.97M15.4 6.5l-6.8 3.97"/></svg>
@@ -619,11 +613,15 @@
       <label><input type="radio" name="testmode" value="off" checked> Normal</label>
       <label><input type="radio" name="testmode" value="network"> Force network error</label>
       <label><input type="radio" name="testmode" value="http"> Force HTTP 500</label>
+      <div class="dev-title dev-title--spaced">Version</div>
+      <div class="dev-ver" id="devVer"></div>
     </div>
   </div>
 
+  <div class="v-spacer top"></div>
+
   <h1>RandoM 8-Ball of Advice</h1>
-  <div class="subtitle">Wisdom you didn't ask for</div>
+  <div class="subtitle" id="subtitle">Wisdom you didn't ask for</div>
 
   <div class="ball-wrap">
     <div class="ball idle" id="ball" role="button" tabindex="0" title="Click to shake for advice" aria-label="Shake the magic 8 ball for advice">
@@ -635,7 +633,7 @@
     <div class="gloss"></div>
   </div>
 
-  <div class="hint" id="hint" role="status" aria-live="polite">Click the ball 🎱</div>
+  <div class="hint" id="hint" role="status" aria-live="polite">Tap the ball 🎱</div>
 
   <div class="nav-row" id="navRow">
     <button class="nav-btn nav-prev" id="navPrev" title="Older advice" aria-label="Older advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6 L8 12 l6 6"/></svg></button>
@@ -643,22 +641,14 @@
     <button class="nav-btn nav-next" id="navNext" title="Newer advice" aria-label="Newer advice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6 L16 12 l-6 6"/></svg></button>
   </div>
 
-  <div class="info-wrap">
-    <button class="info-btn" id="infoBtn" title="About" aria-label="About" aria-haspopup="true" aria-expanded="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.7" r="0.9" fill="currentColor" stroke="none"/></svg>
-    </button>
-    <div class="info-pop" id="infoPop" hidden>
-      Advice courtesy of the
-      <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>
-    <span class="ver">v1.10.3</span>
-    </div>
-  </div>
+  <div class="v-spacer bottom"></div>
 
 <script>
   const ball = document.getElementById('ball');
   const adviceEl = document.getElementById('advice');
   const adviceInner = document.getElementById('adviceInner');
   const hint = document.getElementById('hint');
+  const subtitle = document.getElementById('subtitle');
   const mist = document.getElementById('mist');
   const shareBtn = document.getElementById('shareBtn');
   const shareMenu = document.getElementById('shareMenu');
@@ -706,6 +696,36 @@
   const ASCII_ERROR = '(x_x)';
   const COPIED_MSG = 'Copied to clipboard!';
   const COPY_FAIL_MSG = 'Copy failed. Select the text manually.';
+
+  // App version — single source of truth (shown in the hidden gear panel).
+  const APP_VERSION = 'v1.10.14';
+
+  // Rotating subtitle: the tagline and the API credit swap every 15s. The
+  // tagline shows first, the API credit always comes second. The credit holds
+  // a working link to the API, so no tap-to-switch (that would fight the link).
+  const SUBTITLES = [
+    "Wisdom you didn't ask for",
+    'Powered by the <a href="https://api.adviceslip.com/" target="_blank" rel="noopener">Advice Slip API</a>'
+  ];
+  const SUBTITLE_ROTATE = 15000;
+  let subIdx = 0;
+  let subtitleTimer = null;
+  function setSubtitle(i) {
+    subtitle.classList.add('fading');
+    setTimeout(() => {
+      subtitle.innerHTML = SUBTITLES[i];
+      subtitle.classList.remove('fading');
+    }, 220);
+  }
+  function scheduleSubtitle() {
+    clearTimeout(subtitleTimer);
+    subtitleTimer = setTimeout(advanceSubtitle, SUBTITLE_ROTATE);
+  }
+  function advanceSubtitle() {
+    subIdx = (subIdx + 1) % SUBTITLES.length;
+    setSubtitle(subIdx);
+    scheduleSubtitle();
+  }
 
   const LOADING_MESSAGES = [
     'Consulting the cosmos...',
@@ -940,19 +960,25 @@
     if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); }
   }));
 
-  // --- Debug / test modes (hidden; toggle with Ctrl+Shift+D) ---
+  // --- Debug / test modes (hidden; Ctrl+Shift+D, or long-press the title) ---
   let testMode = 'off';
   const themeSwitch = document.querySelector('.theme-switch');
   const devToggle = document.getElementById('devToggle');
   const devPanel = document.getElementById('devPanel');
+  function setDebugVisible(on) {
+    themeSwitch.classList.toggle('debug-on', on);
+    if (!on) {
+      devPanel.setAttribute('hidden', '');
+      devToggle.setAttribute('aria-expanded', 'false');
+    }
+  }
+  function toggleDebug() {
+    setDebugVisible(!themeSwitch.classList.contains('debug-on'));
+  }
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
       e.preventDefault();
-      const on = themeSwitch.classList.toggle('debug-on');
-      if (!on) {
-        devPanel.setAttribute('hidden', '');
-        devToggle.setAttribute('aria-expanded', 'false');
-      }
+      toggleDebug();
     }
   });
   devToggle.addEventListener('click', () => {
@@ -963,6 +989,25 @@
   document.querySelectorAll('input[name="testmode"]').forEach((r) => {
     r.addEventListener('change', () => { testMode = r.value; });
   });
+
+  // Long-press the title (~5s) to reveal the gear — mobile-friendly way to
+  // reach the debug panel (and the version) where Ctrl+Shift+D isn't available.
+  (function () {
+    const title = document.querySelector('h1');
+    const HOLD_MS = 5000;
+    let holdTimer = null;
+    const startHold = () => {
+      clearTimeout(holdTimer);
+      holdTimer = setTimeout(() => { holdTimer = null; toggleDebug(); }, HOLD_MS);
+    };
+    const cancelHold = () => { clearTimeout(holdTimer); holdTimer = null; };
+    title.addEventListener('pointerdown', startHold);
+    title.addEventListener('pointerup', cancelHold);
+    title.addEventListener('pointerleave', cancelHold);
+    title.addEventListener('pointercancel', cancelHold);
+    // Suppress the iOS long-press callout menu on the title
+    title.addEventListener('contextmenu', (e) => e.preventDefault());
+  })();
 
   // A single network attempt for a given URL. Honors the debug test modes
   // and aborts via the passed signal (per-attempt timeout).
@@ -1095,21 +1140,6 @@
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeShareMenu(); });
 
-  // --- About / API-credit info popover (bottom-right) ---
-  const infoBtn = document.getElementById('infoBtn');
-  const infoPop = document.getElementById('infoPop');
-  function closeInfo() { infoPop.setAttribute('hidden', ''); infoBtn.setAttribute('aria-expanded', 'false'); }
-  infoBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = infoPop.hasAttribute('hidden');
-    if (open) { infoPop.removeAttribute('hidden'); infoBtn.setAttribute('aria-expanded', 'true'); }
-    else { closeInfo(); }
-  });
-  document.addEventListener('click', (e) => {
-    if (!infoPop.hasAttribute('hidden') && !e.target.closest('.info-wrap')) closeInfo();
-  });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInfo(); });
-
   // --- Open a shared link ---
   // Reads ?id= and/or ?advice= from the URL. Returns null if neither present.
   function getShared() {
@@ -1187,6 +1217,12 @@
   updateArrows();
   const shared = getShared();
   if (shared) loadShared(shared);
+
+  // Show the app version in the hidden gear panel (revealed via Ctrl+Shift+D)
+  document.getElementById('devVer').textContent = APP_VERSION;
+
+  // Rotating subtitle: auto-rotate every 15s (tagline first, API credit second).
+  scheduleSubtitle();
 
   // Register the service worker (PWA install + offline shell). Only runs in a
   // secure context (https / installed app); silently skips when opened as a
