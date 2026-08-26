@@ -35,6 +35,7 @@
     --text: #ffffff;
     --chip-bg: rgba(255, 255, 255, 0.08);
     --chip-border: rgba(255, 255, 255, 0.18);
+    --panel-bg: #241a3a;
     --error: #fca5a5;
   }
   /* Modern browsers: full automatic light/dark via light-dark() */
@@ -47,6 +48,7 @@
       --text: light-dark(#241640, #ffffff);
       --chip-bg: light-dark(rgba(45,27,78,0.06), rgba(255,255,255,0.08));
       --chip-border: light-dark(rgba(45,27,78,0.18), rgba(255,255,255,0.18));
+      --panel-bg: light-dark(#f7f4fc, #241a3a);
       --error: light-dark(#c0261f, #fca5a5);
     }
     :root[data-theme="light"] { color-scheme: light; }
@@ -517,7 +519,8 @@
   .ts-sep {
     width: 1px;
     height: 20px;
-    background: var(--chip-border);
+    background: currentColor;
+    opacity: 0.3;
     margin: 0 3px;
     align-self: center;
     display: none;
@@ -550,10 +553,9 @@
     min-width: 200px;
     padding: 12px 14px;
     border-radius: 12px;
-    background: var(--chip-bg);
+    background: var(--panel-bg);
     border: 1px solid var(--chip-border);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    box-shadow: 0 12px 34px rgba(0,0,0,0.5);
     font-size: 0.82rem;
     text-align: left;
   }
@@ -607,7 +609,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.6 6.6 0 0 0 21 12.8z"/></svg>
     </button>
     <span class="ts-sep" aria-hidden="true"></span>
-    <button class="dev-toggle" id="devToggle" title="Test / debug options" aria-label="Debug options" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V15z"/></svg></button>
+    <button class="dev-toggle" id="devToggle" title="Test / debug options" aria-label="Debug options" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.076.124l1.217-.456a1.125 1.125 0 0 1 1.369.49l1.297 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 0 1 0 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.128c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281Z"/><circle cx="12" cy="12" r="3"/></svg></button>
     <div class="dev-panel" id="devPanel" hidden>
       <div class="dev-title">Test mode</div>
       <label><input type="radio" name="testmode" value="off" checked> Normal</label>
@@ -698,7 +700,7 @@
   const COPY_FAIL_MSG = 'Copy failed. Select the text manually.';
 
   // App version — single source of truth (shown in the hidden gear panel).
-  const APP_VERSION = 'v1.10.14';
+  const APP_VERSION = 'v1.10.18';
 
   // Rotating subtitle: the tagline and the API credit swap every 15s. The
   // tagline shows first, the API credit always comes second. The credit holds
@@ -981,10 +983,24 @@
       toggleDebug();
     }
   });
-  devToggle.addEventListener('click', () => {
+  devToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
     const open = devPanel.hasAttribute('hidden');
     if (open) { devPanel.removeAttribute('hidden'); } else { devPanel.setAttribute('hidden', ''); }
     devToggle.setAttribute('aria-expanded', String(open));
+  });
+  // Close the debug panel on outside-click or Escape
+  document.addEventListener('click', (e) => {
+    if (!devPanel.hasAttribute('hidden') && !e.target.closest('.theme-switch')) {
+      devPanel.setAttribute('hidden', '');
+      devToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !devPanel.hasAttribute('hidden')) {
+      devPanel.setAttribute('hidden', '');
+      devToggle.setAttribute('aria-expanded', 'false');
+    }
   });
   document.querySelectorAll('input[name="testmode"]').forEach((r) => {
     r.addEventListener('change', () => { testMode = r.value; });
