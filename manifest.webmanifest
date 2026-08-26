@@ -1,0 +1,16 @@
+{
+  "name": "RandoM 8-Ball of Advice",
+  "short_name": "8-Ball",
+  "description": "Wisdom you didn't ask for. Tap the ball for a random nugget of advice.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1030",
+  "theme_color": "#1a1030",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
